@@ -1,6 +1,7 @@
 ﻿using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Text;
+using Hospital;
 
 class Program
 {
@@ -32,18 +33,33 @@ class Program
         }
     }
 
-    static void GetDoctors(MySqlConnection connection)
+    static List<Doctor> GetDoctors(MySqlConnection connection)
     {
         string query = "SELECT * FROM Doctors";
         using(MySqlCommand command = new MySqlCommand(query, connection))
         using(MySqlDataReader reader = command.ExecuteReader())
         {
+            List<Doctor> doctors = new List<Doctor>();
             while(reader.Read())
             {
-                Console.WriteLine($"{reader["ID"], 3} | {reader["Name"], 20} | " +
-                    $"{reader["Premium"], 5} грн. | {reader["Salary"], 6} грн.");
+                doctors.Add(new Doctor(
+                        (int)reader["ID"],
+                        (string)reader["Name"],
+                        Convert.ToDecimal((double)reader["Premium"]),
+                        Convert.ToDecimal((double)reader["Salary"])
+                    ));
             }
+            return doctors;
         }
+    }
+
+    static void ShowDoctors(IEnumerable<Doctor> doctors)
+    {
+        Console.WriteLine($"{"ID",3} | {"Прізвище та ім`я",20} | " +
+            $"{"Премія",10} | {"Зарплатня",11}");
+        foreach(Doctor doctor in doctors)
+            Console.WriteLine($"{doctor.ID,3} | {doctor.Name,20} | " +
+                        $"{doctor.Premium,5} грн. | {doctor.Salary,6} грн.");
     }
     
     public static void Main(string[] args)
@@ -64,8 +80,9 @@ class Program
             { 
                 connection.Open();
                 CreateTables(connection);
-                AddDoctor(connection, "Петров Петро", 150, 1200);
-                GetDoctors(connection);
+                // AddDoctor(connection, "Петров Петро", 150, 1200);
+                List<Doctor> doctors = GetDoctors(connection);
+                ShowDoctors(doctors);
             } 
             catch (Exception ex)
             {
