@@ -1,4 +1,5 @@
 ﻿using Hospital;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,90 @@ using System.Threading.Tasks;
 
 namespace Hospital
 {
+    class DBManager
+    {
+        MySqlConnection connection;
+
+        public DBManager(MySqlConnection connection)
+        {
+            this.connection = connection;
+        }
+
+        public void CreateTables()
+        {
+            string query =
+                "CREATE TABLE IF NOT EXISTS Doctors (" +
+                "   ID INT AUTO_INCREMENT PRIMARY KEY," +
+                "   Name VARCHAR(100)," +
+                "   Premium DOUBLE," +
+                "   Salary DOUBLE" +
+                ");";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void AddDoctor(string name, double premium, double salary)
+        {
+            string query =
+                "INSERT INTO Doctors (Name, Premium, Salary) VALUES (@name, @premium, @salary)";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@name", name);
+                command.Parameters.AddWithValue("@premium", premium);
+                command.Parameters.AddWithValue("@salary", salary);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public List<Doctor> GetDoctors()
+        {
+            string query = "SELECT * FROM Doctors";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            using (MySqlDataReader reader = command.ExecuteReader())
+            {
+                List<Doctor> doctors = new List<Doctor>();
+                while (reader.Read())
+                {
+                    doctors.Add(new Doctor(
+                            (int)reader["ID"],
+                            (string)reader["Name"],
+                            Convert.ToDecimal((double)reader["Premium"]),
+                            Convert.ToDecimal((double)reader["Salary"])
+                        ));
+                }
+                return doctors;
+            }
+        }
+
+        public void RemoveDoctor(int id)
+        {
+            string query = "DELETE FROM Doctors WHERE ID=@id";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@id", id);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void EditDoctor(int id, Doctor update)
+        {
+            string query = "UPDATE Doctors " +
+                "SET ID=@id, Name=@name, Premium=@premium, Salary=@salary " +
+                "WHERE ID=@source_id;";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@source_id", id);
+                command.Parameters.AddWithValue("@id", update.ID);
+                command.Parameters.AddWithValue("@name", update.Name);
+                command.Parameters.AddWithValue("@premium", update.Premium);
+                command.Parameters.AddWithValue("@salary", update.Salary);
+                command.ExecuteNonQuery();
+            }
+        }
+    }
+
     class Doctor
     {
         public int ID { get; set; }
