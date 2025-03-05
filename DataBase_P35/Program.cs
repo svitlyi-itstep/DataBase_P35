@@ -53,6 +53,33 @@ class Program
         }
     }
 
+    static void RemoveDoctor(MySqlConnection connection, int id)
+    {
+        string query = "DELETE FROM Doctors WHERE ID=@id";
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@id", id);
+            command.ExecuteNonQuery();
+        }
+    }
+
+    static void EditDoctor(MySqlConnection connection, int id, Doctor update)
+    {
+        string query = "UPDATE Doctors " +
+            "SET ID=@id, Name=@name, Premium=@premium, Salary=@salary " +
+            "WHERE ID=@source_id;";
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@source_id", id);
+            command.Parameters.AddWithValue("@id", update.ID);
+            command.Parameters.AddWithValue("@name", update.Name);
+            command.Parameters.AddWithValue("@premium", update.Premium);
+            command.Parameters.AddWithValue("@salary", update.Salary);
+            command.ExecuteNonQuery();
+        }
+    }
+
+
     static void ShowDoctors(IEnumerable<Doctor> doctors)
     {
         Console.WriteLine($"{"ID",3} | {"Прізвище та ім`я",20} | " +
@@ -80,9 +107,22 @@ class Program
             { 
                 connection.Open();
                 CreateTables(connection);
-                // AddDoctor(connection, "Петров Петро", 150, 1200);
+                AddDoctor(connection, "Ніколаєнко Василь", 200, 1500);
                 List<Doctor> doctors = GetDoctors(connection);
                 ShowDoctors(doctors);
+                Doctor last_doctor = doctors.Last();
+
+                Console.ReadLine();
+                EditDoctor(connection, last_doctor.ID, new Doctor(last_doctor.ID, "Григоренко Василь", 250, 1500));
+                doctors = GetDoctors(connection);
+                ShowDoctors(doctors);
+                last_doctor = doctors.Last();
+
+                Console.ReadLine();
+                RemoveDoctor(connection, last_doctor.ID);
+                doctors = GetDoctors(connection);
+                ShowDoctors(doctors);
+
             } 
             catch (Exception ex)
             {
