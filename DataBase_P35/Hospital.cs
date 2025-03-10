@@ -1,5 +1,6 @@
 ﻿using Hospital;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Asn1.Cmp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,32 @@ namespace Hospital
             using (MySqlCommand command = new MySqlCommand(query, connection))
             {
                 command.ExecuteNonQuery();
+            }
+        }
+
+        public void AddTestData()
+        {
+            AddDoctor("Григоренко Василь", 230, 1540);
+            AddDoctor("Петров Дмитро", 160, 1300);
+            AddDoctor("Ніколаєнко Захар", 200, 1250);
+            AddDoctor("Дейнега Кирило", 90, 1800);
+            
+            AddSpecialization("Хірург");
+            AddSpecialization("Кардіолог");
+            AddSpecialization("Педіатр");
+
+            Random rnd = new Random();
+            List<Specialization> specializations = GetSpecializations();
+            List<Doctor> doctors = GetDoctors();
+
+            foreach (Doctor doctor in doctors)
+            {
+                for (int i = 0; i < rnd.Next(1, 3); i++)
+                {
+                    int specId = specializations[rnd.Next(0, specializations.Count)].ID;
+                    if (!IsDoctorHaveSpecialization(doctor.ID, specId))
+                        AddDoctorSpecialization(doctor.ID, specId);
+                }
             }
         }
 
@@ -111,6 +138,25 @@ namespace Hospital
                 command.Parameters.AddWithValue("@doctorID", doctorID);
                 command.Parameters.AddWithValue("@specializationID", specializationID);
                 return command.ExecuteNonQuery();
+            }
+        }
+
+        public bool IsDoctorHaveSpecialization(int doctorID, int specializationID)
+        {
+            string query = "SELECT ID FROM DoctorsSpecializations" +
+                " WHERE DoctorID=@doctorID AND SpecializationID=@specializationID";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@doctorID", doctorID);
+                command.Parameters.AddWithValue("@specializationID", specializationID);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        return true;
+                    }
+                    return false;
+                }
             }
         }
 

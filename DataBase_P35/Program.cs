@@ -35,6 +35,7 @@ class Program
                 DBManager DataBase = new DBManager(connection);
 
                 DataBase.CreateTables();
+                DataBase.AddTestData();
                 //DataBase.AddDoctor("Ніколаєнко Василь", 200, 1500);
                 //List<Doctor> doctors = DataBase.GetDoctors();
                 //ShowDoctors(doctors);
@@ -84,9 +85,7 @@ class Program
                 
                  */
 
-                DataBase.AddSpecialization("Хірург");
-                DataBase.AddSpecialization("Кардіолог");
-                DataBase.AddSpecialization("Педіатр");
+                
 
 
             }
