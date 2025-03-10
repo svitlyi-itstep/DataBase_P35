@@ -41,7 +41,8 @@ class Program
                 Doctor last_doctor = doctors.Last();
 
                 Console.ReadLine();
-                DataBase.EditDoctor(last_doctor.ID, new Doctor(last_doctor.ID, "Григоренко Василь", 250, 1500));
+                DataBase.EditDoctor(last_doctor.ID, 
+                    new Doctor(last_doctor.ID, "Григоренко Василь", 250, 1500));
                 doctors = DataBase.GetDoctors();
                 ShowDoctors(doctors);
                 last_doctor = doctors.Last();
@@ -51,12 +52,26 @@ class Program
                 doctors = DataBase.GetDoctors();
                 ShowDoctors(doctors);
 
-            } 
+                /*
+                 
+                Зробити інформаційну систему лікарів, яка одразу виводить
+                таблицю з лікарями та меню, яке пропонує наступні дії:
+                1. Додати лікаря
+                2. Змінити лікаря
+                3. Видалити лікаря
+                0. Вихід
+
+                В клас DBManager додати функцію, яка заповнює таблиці бази даних
+                тестовими даними (мінімум 4 рядки таблиці).
+                 
+                 */
+
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
-            
+            Environment.Exit(0);
         }
     }
 }

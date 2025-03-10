@@ -25,12 +25,96 @@ namespace Hospital
                 "   Name VARCHAR(100)," +
                 "   Premium DOUBLE," +
                 "   Salary DOUBLE" +
+                ");" +
+
+                "CREATE TABLE IF NOT EXISTS Specializations (" +
+                "   ID INT AUTO_INCREMENT PRIMARY KEY," +
+                "   Name VARCHAR(100)" +
+                ");" +
+
+                "CREATE TABLE IF NOT EXISTS DoctorsSpecializations (" +
+                "   ID INT AUTO_INCREMENT PRIMARY KEY," +
+                "   DoctorID INT," +
+                "   SpecializationID INT," +
+                "   FOREIGN KEY (DoctorID) REFERENCES Doctors(ID)," +
+                "   FOREIGN KEY (SpecializationID) REFERENCES Specializations(ID)" +
                 ");";
             using (MySqlCommand command = new MySqlCommand(query, connection))
             {
                 command.ExecuteNonQuery();
             }
         }
+
+        // == SPECIALIZATIONS
+
+        public void AddSpecialization(string name)
+        {
+            string query =
+                "INSERT INTO Specializations (Name) VALUES (@name)";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@name", name);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public int RemoveSpecialization(int id)
+        {
+            string query = "DELETE FROM Specializations WHERE ID=@id";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@id", id);
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        public List<Specialization> GetSpecializations()
+        {
+            string query = "SELECT * FROM Specializations";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            using (MySqlDataReader reader = command.ExecuteReader())
+            {
+                List<Specialization> specializations = new List<Specialization>();
+                while (reader.Read())
+                {
+                    specializations.Add(
+                        new Specialization(
+                            (int)reader["ID"],
+                            (string)reader["Name"]
+                        ));
+                }
+                return specializations;
+            }
+        }
+
+        // == DOCTORS SPECIALIZATIONS
+
+        public void AddDoctorSpecialization(int doctorID, int specializationID)
+        {
+            string query =
+                "INSERT INTO DoctorsSpecializations (DoctorID, SpecializationID)" +
+                " VALUES (@doctorID, @specializationID)";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@doctorID", doctorID);
+                command.Parameters.AddWithValue("@specializationID", specializationID);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public int RemoveDoctorSpecialization(int doctorID, int specializationID)
+        {
+            string query = "DELETE FROM DoctorsSpecializations" +
+                " WHERE DoctorID=@doctorID AND SpecializationID=@specializationID";
+            using (MySqlCommand command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@doctorID", doctorID);
+                command.Parameters.AddWithValue("@specializationID", specializationID);
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        // == DOCTORS
 
         public void AddDoctor(string name, double premium, double salary)
         {
@@ -65,17 +149,17 @@ namespace Hospital
             }
         }
 
-        public void RemoveDoctor(int id)
+        public int RemoveDoctor(int id)
         {
             string query = "DELETE FROM Doctors WHERE ID=@id";
             using (MySqlCommand command = new MySqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
-                command.ExecuteNonQuery();
+                return command.ExecuteNonQuery();
             }
         }
 
-        public void EditDoctor(int id, Doctor update)
+        public int EditDoctor(int id, Doctor update)
         {
             string query = "UPDATE Doctors " +
                 "SET ID=@id, Name=@name, Premium=@premium, Salary=@salary " +
@@ -87,7 +171,7 @@ namespace Hospital
                 command.Parameters.AddWithValue("@name", update.Name);
                 command.Parameters.AddWithValue("@premium", update.Premium);
                 command.Parameters.AddWithValue("@salary", update.Salary);
-                command.ExecuteNonQuery();
+                return command.ExecuteNonQuery();
             }
         }
     }
@@ -111,6 +195,21 @@ namespace Hospital
             decimal premium, decimal salary)
             : this(0, name, premium, salary) { }
         public Doctor() : this(0, "", 0, 0) { }
+    }
+
+    class Specialization
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+
+        public Specialization(int id, string name)
+        {
+            ID = id;
+            Name = name;
+        }
+        public Specialization(string name)
+            : this(0, name) { }
+        public Specialization() : this(0, "") { }
     }
 }
 
