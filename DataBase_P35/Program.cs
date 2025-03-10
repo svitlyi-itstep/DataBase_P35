@@ -35,22 +35,22 @@ class Program
                 DBManager DataBase = new DBManager(connection);
 
                 DataBase.CreateTables();
-                DataBase.AddDoctor("Ніколаєнко Василь", 200, 1500);
-                List<Doctor> doctors = DataBase.GetDoctors();
-                ShowDoctors(doctors);
-                Doctor last_doctor = doctors.Last();
+                //DataBase.AddDoctor("Ніколаєнко Василь", 200, 1500);
+                //List<Doctor> doctors = DataBase.GetDoctors();
+                //ShowDoctors(doctors);
+                //Doctor last_doctor = doctors.Last();
 
-                Console.ReadLine();
-                DataBase.EditDoctor(last_doctor.ID, 
-                    new Doctor(last_doctor.ID, "Григоренко Василь", 250, 1500));
-                doctors = DataBase.GetDoctors();
-                ShowDoctors(doctors);
-                last_doctor = doctors.Last();
+                //Console.ReadLine();
+                //DataBase.EditDoctor(last_doctor.ID, 
+                //    new Doctor(last_doctor.ID, "Григоренко Василь", 250, 1500));
+                //doctors = DataBase.GetDoctors();
+                //ShowDoctors(doctors);
+                //last_doctor = doctors.Last();
 
-                Console.ReadLine();
-                DataBase.RemoveDoctor(last_doctor.ID);
-                doctors = DataBase.GetDoctors();
-                ShowDoctors(doctors);
+                //Console.ReadLine();
+                //DataBase.RemoveDoctor(last_doctor.ID);
+                //doctors = DataBase.GetDoctors();
+                //ShowDoctors(doctors);
 
                 /*
                  
@@ -65,6 +65,29 @@ class Program
                 тестовими даними (мінімум 4 рядки таблиці).
                  
                  */
+
+                /*
+                
+                Додати у клас DBManager функціонал для роботи з спеціалізаціями
+                лікарів. 
+
+                Додати 2 таблиці:
+                - спеціалізації
+                - спеціалізації в лікарів
+                
+                Додати функції для:
+                - додавання/видалення/отримання спеціалізацій
+                - додавання/видалення спеціалізацій у лікарів
+
+                Додати при виведенні лікарів виведення їх спеціалізацій.
+                 
+                
+                 */
+
+                DataBase.AddSpecialization("Хірург");
+                DataBase.AddSpecialization("Кардіолог");
+                DataBase.AddSpecialization("Педіатр");
+
 
             }
             catch (Exception ex)
